@@ -1,5 +1,5 @@
-from minic.ir import (BinOp, BinOpInstr, IrGen, LoadLiteralInstr, LoadRegInstr,
-                      PrintInstr, Reg)
+from minic.ir_gen import (BinOp, BinOpInstr, IrGen, LoadLiteralInstr,
+                          LoadRegInstr, PrintInstr, Reg)
 from minic.parser import Parser
 from minic.scanner import Scanner
 
