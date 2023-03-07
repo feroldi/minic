@@ -292,9 +292,6 @@ def test_do_not_eliminate_common_subexpressions_when_var_changes():
     ]
 
 
-# TODO: Test whether reassigning a var and doing the same expression makes it incorrectly eliminate.
-
-
 def _ir_gen(code: str):
     scanner = Scanner(code)
     parser = Parser(scanner=scanner)
