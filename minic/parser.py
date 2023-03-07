@@ -1,6 +1,5 @@
-from dataclasses import dataclass
-from enum import Enum, auto
-
+from minic.ast import (AssignStmt, BinOp, BinOpExpr, NumberExpr, ParenExpr,
+                       PrintStmt, ProgramStmt, VarExpr)
 from minic.scanner import TokenKind
 
 
@@ -111,13 +110,6 @@ class Parser:
         return tok
 
 
-class BinOp(Enum):
-    Add = auto()
-    Sub = auto()
-    Times = auto()
-    Div = auto()
-
-
 def bin_op_from_tok_kind(tok_kind: TokenKind) -> BinOp:
     match tok_kind:
         case TokenKind.Plus:
@@ -130,79 +122,3 @@ def bin_op_from_tok_kind(tok_kind: TokenKind) -> BinOp:
             return BinOp.Div
 
     assert False
-
-
-class Expr:
-    def accept(self, visitor):
-        raise NotImplementedError()
-
-
-class Stmt:
-    def accept(self, visitor):
-        raise NotImplementedError()
-
-
-@dataclass(frozen=True)
-class NumberExpr(Expr):
-    val: int
-
-    def accept(self, visitor):
-        visitor.visit_number_expr(self)
-
-
-@dataclass(frozen=True)
-class VarExpr(Expr):
-    ident: str
-
-    def accept(self, visitor):
-        visitor.visit_var_expr(self)
-
-
-@dataclass(frozen=True)
-class BinOpExpr(Expr):
-    op: BinOp
-    left: Expr
-    right: Expr
-
-    def accept(self, visitor):
-        self.left.accept(visitor)
-        self.right.accept(visitor)
-        visitor.visit_bin_op_expr(self)
-
-
-@dataclass(frozen=True)
-class ParenExpr(Expr):
-    inner: Expr
-
-    def accept(self, visitor):
-        self.inner.accept(visitor)
-        visitor.visit_paren_expr(self)
-
-
-@dataclass(frozen=True)
-class PrintStmt(Stmt):
-    arg: Expr
-
-    def accept(self, visitor):
-        self.arg.accept(visitor)
-        visitor.visit_print_stmt(self)
-
-
-@dataclass(frozen=True)
-class AssignStmt(Stmt):
-    target_ident: str
-    value: Expr
-
-    def accept(self, visitor):
-        self.value.accept(visitor)
-        visitor.visit_assign_stmt(self)
-
-
-@dataclass(frozen=True)
-class ProgramStmt(Stmt):
-    stmts: list[Stmt]
-
-    def accept(self, visitor):
-        for stmt in self.stmts:
-            stmt.accept(visitor)
-        visitor.visit_program_stmt(self)

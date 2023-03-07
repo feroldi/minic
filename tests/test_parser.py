@@ -2,8 +2,9 @@ import string
 
 import hypothesis.strategies as st
 from hypothesis import given
-from minic.parser import (AssignStmt, BinOp, BinOpExpr, NumberExpr, ParenExpr,
-                          Parser, PrintStmt, ProgramStmt, VarExpr)
+from minic.ast import (AssignStmt, BinOp, BinOpExpr, NumberExpr, ParenExpr,
+                       PrintStmt, ProgramStmt, VarExpr)
+from minic.parser import Parser
 from minic.scanner import Scanner, Token, TokenKind
 
 

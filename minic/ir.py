@@ -1,32 +1,9 @@
 from dataclasses import dataclass
 from enum import Enum, auto
 
-from minic import parser
-from minic.parser import (AssignStmt, BinOpExpr, NumberExpr, ParenExpr,
-                          PrintStmt, ProgramStmt, VarExpr)
-
-
-class AstVisitor:
-    def visit_program_stmt(self, program_stmt: ProgramStmt):
-        raise NotImplementedError()
-
-    def visit_assign_stmt(self, assign_stmt: AssignStmt):
-        raise NotImplementedError()
-
-    def visit_print_stmt(self, print_stmt: PrintStmt):
-        raise NotImplementedError()
-
-    def visit_paren_expr(self, paren_expr: ParenExpr):
-        raise NotImplementedError()
-
-    def visit_bin_op_expr(self, bin_op_expr: BinOpExpr):
-        raise NotImplementedError()
-
-    def visit_var_expr(self, var_expr: VarExpr):
-        raise NotImplementedError()
-
-    def visit_number_expr(self, number_expr: NumberExpr):
-        raise NotImplementedError()
+from minic import ast
+from minic.ast import (AssignStmt, AstVisitor, BinOpExpr, NumberExpr,
+                       ParenExpr, PrintStmt, ProgramStmt, VarExpr)
 
 
 class IrGen(AstVisitor):
@@ -127,15 +104,15 @@ class BinOp(Enum):
     Div = auto()
 
 
-def bin_op_from_node_op(node_op: parser.BinOp) -> BinOp:
+def bin_op_from_node_op(node_op: ast.BinOp) -> BinOp:
     match node_op:
-        case parser.BinOp.Add:
+        case ast.BinOp.Add:
             return BinOp.Add
-        case parser.BinOp.Sub:
+        case ast.BinOp.Sub:
             return BinOp.Sub
-        case parser.BinOp.Times:
+        case ast.BinOp.Times:
             return BinOp.Times
-        case parser.BinOp.Div:
+        case ast.BinOp.Div:
             return BinOp.Div
 
     assert False
