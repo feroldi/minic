@@ -10,7 +10,7 @@ def test_load_a_literal_into_a_register():
     b = 123
     """
 
-    program = _ir_gen(code)
+    program = _gen_ir(code)
 
     assert program.instructions == [
         LoadLiteralInstr(out_reg=Reg(0), value=42),
@@ -26,7 +26,7 @@ def test_load_a_register_into_another_register():
     b = a
     """
 
-    program = _ir_gen(code)
+    program = _gen_ir(code)
 
     assert program.instructions == [
         LoadLiteralInstr(out_reg=Reg(0), value=42),
@@ -40,7 +40,7 @@ def test_simple_addition():
     a = 15 + 25
     """
 
-    program = _ir_gen(code)
+    program = _gen_ir(code)
 
     assert program.instructions == [
         LoadLiteralInstr(out_reg=Reg(0), value=15),
@@ -56,7 +56,7 @@ def test_expression_of_operations():
     b = 20 + a * 52
     """
 
-    program = _ir_gen(code)
+    program = _gen_ir(code)
 
     assert program.instructions == [
         # a = 15
@@ -90,7 +90,7 @@ def test_expression_of_operations():
     a = (20 + 15) * 52
     """
 
-    program = _ir_gen(code)
+    program = _gen_ir(code)
 
     assert program.instructions == [
         # 20
@@ -124,7 +124,7 @@ def test_subtractions_and_divisions():
     b = 20 - a / 52
     """
 
-    program = _ir_gen(code)
+    program = _gen_ir(code)
 
     assert program.instructions == [
         # a = 15
@@ -160,7 +160,7 @@ def test_print_a_value():
     print a
     """
 
-    program = _ir_gen(code)
+    program = _gen_ir(code)
 
     assert program.instructions == [
         LoadLiteralInstr(out_reg=Reg(0), value=42),
@@ -177,7 +177,7 @@ def test_reuse_registers_when_the_same_number_is_found():
     print 42
     """
 
-    program = _ir_gen(code)
+    program = _gen_ir(code)
 
     assert program.instructions == [
         LoadLiteralInstr(out_reg=Reg(0), value=42),
@@ -199,7 +199,7 @@ def test_define_new_reg_when_shadowing_vars():
     print a
     """
 
-    program = _ir_gen(code)
+    program = _gen_ir(code)
 
     assert program.instructions == [
         LoadLiteralInstr(out_reg=Reg(0), value=42),
@@ -216,7 +216,7 @@ def test_eliminate_common_subexpressions():
     print a
     """
 
-    program = _ir_gen(code)
+    program = _gen_ir(code)
 
     assert program.instructions == [
         LoadLiteralInstr(out_reg=Reg(0), value=1),
@@ -247,7 +247,7 @@ def test_do_not_eliminate_common_subexpressions_when_var_changes():
     print c
     """
 
-    program = _ir_gen(code)
+    program = _gen_ir(code)
 
     assert program.instructions == [
         # a = 42
@@ -292,7 +292,7 @@ def test_do_not_eliminate_common_subexpressions_when_var_changes():
     ]
 
 
-def _ir_gen(code: str):
+def _gen_ir(code: str):
     scanner = Scanner(code)
     parser = Parser(scanner=scanner)
     ir_gen = IrGen(parser.parse_program())
