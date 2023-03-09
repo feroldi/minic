@@ -13,7 +13,7 @@ def main():
     in_filename = Path(sys.argv[1])
     code = in_filename.read_text()
     asm_code = compile_minic(code)
-    out_filename = in_filename.with_suffix(".s")
+    out_filename = in_filename.with_suffix(".S")
     out_filename.write_text(asm_code)
 
 
