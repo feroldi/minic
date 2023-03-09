@@ -1,9 +1,8 @@
-from dataclasses import dataclass
-from enum import Enum, auto
-
 from minic import ast
 from minic.ast import (AssignStmt, AstVisitor, BinOpExpr, NumberExpr,
                        ParenExpr, PrintStmt, ProgramStmt, VarExpr)
+from minic.ir import (BinOp, BinOpInstr, LoadLiteralInstr, LoadRegInstr,
+                      PrintInstr, Program, Reg)
 
 
 class IrGen(AstVisitor):
@@ -97,13 +96,6 @@ class IrGen(AstVisitor):
         self.reg_stack.append(out_reg)
 
 
-class BinOp(Enum):
-    Add = auto()
-    Sub = auto()
-    Times = auto()
-    Div = auto()
-
-
 def bin_op_from_node_op(node_op: ast.BinOp) -> BinOp:
     match node_op:
         case ast.BinOp.Add:
@@ -111,47 +103,8 @@ def bin_op_from_node_op(node_op: ast.BinOp) -> BinOp:
         case ast.BinOp.Sub:
             return BinOp.Sub
         case ast.BinOp.Times:
-            return BinOp.Times
+            return BinOp.Mul
         case ast.BinOp.Div:
             return BinOp.Div
 
     assert False
-
-
-@dataclass(frozen=True)
-class Reg:
-    idx: int
-
-
-class Instr:
-    pass
-
-
-@dataclass
-class Program:
-    instructions: list[Instr]
-
-
-@dataclass
-class LoadLiteralInstr(Instr):
-    out_reg: Reg
-    value: int
-
-
-@dataclass
-class LoadRegInstr(Instr):
-    out_reg: Reg
-    in_reg: Reg
-
-
-@dataclass
-class BinOpInstr(Instr):
-    out_reg: Reg
-    op: BinOp
-    left_reg: Reg
-    right_reg: Reg
-
-
-@dataclass
-class PrintInstr(Instr):
-    arg_reg: Reg

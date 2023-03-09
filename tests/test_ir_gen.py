@@ -1,7 +1,6 @@
-from minic.ir_gen import (BinOp, BinOpInstr, IrGen, LoadLiteralInstr,
-                          LoadRegInstr, PrintInstr, Reg)
-from minic.parser import Parser
-from minic.scanner import Scanner
+from minic.ir import (BinOp, BinOpInstr, LoadLiteralInstr, LoadRegInstr,
+                      PrintInstr, Reg)
+from minic.ir_gen import IrGen
 
 
 def test_load_a_literal_into_a_register():
@@ -69,7 +68,7 @@ def test_expression_of_operations():
         # a * 52
         BinOpInstr(
             out_reg=Reg(4),
-            op=BinOp.Times,
+            op=BinOp.Mul,
             left_reg=Reg(1),
             right_reg=Reg(3),
         ),
@@ -109,7 +108,7 @@ def test_expression_of_operations():
         # * 52
         BinOpInstr(
             out_reg=Reg(4),
-            op=BinOp.Times,
+            op=BinOp.Mul,
             left_reg=Reg(2),
             right_reg=Reg(3),
         ),
@@ -229,7 +228,7 @@ def test_eliminate_common_subexpressions():
         ),
         BinOpInstr(
             out_reg=Reg(3),
-            op=BinOp.Times,
+            op=BinOp.Mul,
             left_reg=Reg(2),
             right_reg=Reg(2),
         ),
@@ -264,7 +263,7 @@ def test_do_not_eliminate_common_subexpressions_when_var_changes():
         # b = (a + 2) * (a + 2)
         BinOpInstr(
             out_reg=Reg(4),
-            op=BinOp.Times,
+            op=BinOp.Mul,
             left_reg=Reg(3),
             right_reg=Reg(3),
         ),
@@ -282,7 +281,7 @@ def test_do_not_eliminate_common_subexpressions_when_var_changes():
         # c = (a + 2) * (a + 2)
         BinOpInstr(
             out_reg=Reg(9),
-            op=BinOp.Times,
+            op=BinOp.Mul,
             left_reg=Reg(8),
             right_reg=Reg(8),
         ),
@@ -293,6 +292,9 @@ def test_do_not_eliminate_common_subexpressions_when_var_changes():
 
 
 def _gen_ir(code: str):
+    from minic.parser import Parser
+    from minic.scanner import Scanner
+
     scanner = Scanner(code)
     parser = Parser(scanner=scanner)
     ir_gen = IrGen(parser.parse_program())
