@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from minic.ir_gen import IrGen
 from minic.parser import Parser
 from minic.scanner import Scanner
