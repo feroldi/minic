@@ -6,12 +6,13 @@ from typing import Union
 class R(Enum):
     Eax = auto()
     Edi = auto()
-    Rbp = auto()
-    Rsp = auto()
     Rax = auto()
-    Rdx = auto()
-    Rsi = auto()
+    Rbp = auto()
     Rdi = auto()
+    Rdx = auto()
+    Rip = auto()
+    Rsi = auto()
+    Rsp = auto()
 
     def dump(self) -> str:
         return self.name.lower()
@@ -46,12 +47,18 @@ class Size(Enum):
 class MemOffset:
     size: Size
     base: R
-    displacement: int
+    displacement: Union[int, Label]
 
     def dump(self) -> str:
-        disp = (
-            f"+{self.displacement}" if self.displacement > 0 else str(self.displacement)
-        )
+        if isinstance(self.displacement, Label):
+            disp = f" + {self.displacement.dump()}"
+        else:
+            disp = (
+                f"+{self.displacement}"
+                if self.displacement > 0
+                else str(self.displacement)
+            )
+
         return f"{self.size.dump()} [{self.base.dump()}{disp}]"
 
 
@@ -83,6 +90,15 @@ class Mov(X86_64_Instr):
 
     def dump(self) -> str:
         return f"mov {self.dst.dump()}, {self.src.dump()}"
+
+
+@dataclass(frozen=True)
+class Lea(X86_64_Instr):
+    dst: Union[R, MemOffset]
+    src: Union[R, Imm, MemOffset, Label]
+
+    def dump(self) -> str:
+        return f"lea {self.dst.dump()}, {self.src.dump()}"
 
 
 @dataclass(frozen=True)
@@ -146,12 +162,14 @@ class X86_64_Program:
 
     def dump(self) -> str:
         output = [
-            ".section .data",
+            ".intel_syntax noprefix",
+            "",
+            ".data",
             ".PRINTF_FMT_LLD:",
             '    .string "%lld\\n"',
             "",
-            ".section text",
-            ".globl main",
+            ".text",
+            ".global main",
             "main:",
         ]
 

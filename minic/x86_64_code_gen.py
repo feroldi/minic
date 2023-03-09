@@ -1,7 +1,8 @@
 from minic.ir import (BinOp, BinOpInstr, Instr, LoadLiteralInstr, LoadRegInstr,
                       PrintInstr, Program, Reg)
-from minic.x86_64 import (Add, Call, Cqo, Idiv, Imm, Imul, Label, MemOffset,
-                          Mov, Pop, Push, R, Ret, Size, Sub, X86_64_Program)
+from minic.x86_64 import (Add, Call, Cqo, Idiv, Imm, Imul, Label, Lea,
+                          MemOffset, Mov, Pop, Push, R, Ret, Size, Sub,
+                          X86_64_Program)
 
 
 class X86_64_CodeGen:
@@ -22,10 +23,13 @@ class X86_64_CodeGen:
             header.append(Sub(R.Rsp, Imm(self.allocated_size)))
 
         footer = [
-            Pop(R.Rbp),
             Mov(R.Eax, Imm(0)),
+            Pop(R.Rbp),
             Ret(),
         ]
+
+        if self.allocated_size:
+            footer.insert(1, Add(R.Rsp, Imm(self.allocated_size)))
 
         return X86_64_Program(
             instructions=[
@@ -116,7 +120,9 @@ class X86_64_CodeGen:
                 return [
                     Mov(R.Rax, arg_mem_offset),
                     Mov(R.Rsi, R.Rax),
-                    Mov(R.Rdi, Label(".PRINTF_FMT_LLD")),
+                    Lea(
+                        R.Rdi, MemOffset(Size.QWordPtr, R.Rip, Label(".PRINTF_FMT_LLD"))
+                    ),
                     Mov(R.Eax, Imm(0)),
                     Call(Label("printf")),
                 ]

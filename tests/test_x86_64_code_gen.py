@@ -1,7 +1,8 @@
 from minic.ir import (BinOp, BinOpInstr, LoadLiteralInstr, LoadRegInstr,
                       PrintInstr, Program, Reg)
-from minic.x86_64 import (Add, Call, Cqo, Idiv, Imm, Imul, Label, MemOffset,
-                          Mov, Pop, Push, R, Ret, Size, Sub, X86_64_Program)
+from minic.x86_64 import (Add, Call, Cqo, Idiv, Imm, Imul, Label, Lea,
+                          MemOffset, Mov, Pop, Push, R, Ret, Size, Sub,
+                          X86_64_Program)
 from minic.x86_64_code_gen import X86_64_CodeGen
 
 
@@ -17,8 +18,8 @@ def test_generate_instructions_to_return_zero_for_empty_ir():
             Push(R.Rbp),
             Mov(R.Rbp, R.Rsp),
             # Footer.
-            Pop(R.Rbp),
             Mov(R.Eax, Imm(0)),
+            Pop(R.Rbp),
             Ret(),
         ]
     )
@@ -45,8 +46,9 @@ def test_generate_mov_instructions_for_load_literal():
             Mov(MemOffset(Size.QWordPtr, R.Rbp, -8), Imm(42)),
             Mov(MemOffset(Size.QWordPtr, R.Rbp, -16), Imm(123)),
             # Footer.
-            Pop(R.Rbp),
             Mov(R.Eax, Imm(0)),
+            Add(R.Rsp, Imm(16)),
+            Pop(R.Rbp),
             Ret(),
         ]
     )
@@ -79,8 +81,9 @@ def test_generate_mov_instructions_for_load_reg():
             Mov(R.Rax, MemOffset(Size.QWordPtr, R.Rbp, -8)),
             Mov(MemOffset(Size.QWordPtr, R.Rbp, -32), R.Rax),
             # Footer.
-            Pop(R.Rbp),
             Mov(R.Eax, Imm(0)),
+            Add(R.Rsp, Imm(32)),
+            Pop(R.Rbp),
             Ret(),
         ]
     )
@@ -117,8 +120,9 @@ def test_generate_add_instruction():
             Add(R.Rax, R.Rdx),
             Mov(MemOffset(Size.QWordPtr, R.Rbp, -24), R.Rax),
             # Footer.
-            Pop(R.Rbp),
             Mov(R.Eax, Imm(0)),
+            Add(R.Rsp, Imm(24)),
+            Pop(R.Rbp),
             Ret(),
         ]
     )
@@ -155,8 +159,9 @@ def test_generate_sub_instruction():
             Sub(R.Rax, R.Rdx),
             Mov(MemOffset(Size.QWordPtr, R.Rbp, -24), R.Rax),
             # Footer.
-            Pop(R.Rbp),
             Mov(R.Eax, Imm(0)),
+            Add(R.Rsp, Imm(24)),
+            Pop(R.Rbp),
             Ret(),
         ]
     )
@@ -193,8 +198,9 @@ def test_generate_imul_instruction():
             Imul(R.Rax, R.Rdx),
             Mov(MemOffset(Size.QWordPtr, R.Rbp, -24), R.Rax),
             # Footer.
-            Pop(R.Rbp),
             Mov(R.Eax, Imm(0)),
+            Add(R.Rsp, Imm(24)),
+            Pop(R.Rbp),
             Ret(),
         ]
     )
@@ -231,8 +237,9 @@ def test_generate_div_instruction():
             Idiv(MemOffset(Size.QWordPtr, R.Rbp, -16)),
             Mov(MemOffset(Size.QWordPtr, R.Rbp, -24), R.Rax),
             # Footer.
-            Pop(R.Rbp),
             Mov(R.Eax, Imm(0)),
+            Add(R.Rsp, Imm(24)),
+            Pop(R.Rbp),
             Ret(),
         ]
     )
@@ -259,12 +266,13 @@ def test_generate_call_to_print():
             Mov(MemOffset(Size.QWordPtr, R.Rbp, -8), Imm(42)),
             Mov(R.Rax, MemOffset(Size.QWordPtr, R.Rbp, -8)),
             Mov(R.Rsi, R.Rax),
-            Mov(R.Rdi, Label(".PRINTF_FMT_LLD")),
+            Lea(R.Rdi, MemOffset(Size.QWordPtr, R.Rip, Label(".PRINTF_FMT_LLD"))),
             Mov(R.Eax, Imm(0)),
             Call(Label("printf")),
             # Footer.
-            Pop(R.Rbp),
             Mov(R.Eax, Imm(0)),
+            Add(R.Rsp, Imm(8)),
+            Pop(R.Rbp),
             Ret(),
         ]
     )
