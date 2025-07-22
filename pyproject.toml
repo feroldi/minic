@@ -9,7 +9,7 @@ python = "^3.10"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
-black = "^23.1.0"
+black = "^24.3.0"
 hypothesis = "^6.68.2"
 isort = "^5.12.0"
 
